@@ -1,23 +1,27 @@
 import { Model, DataTypes } from 'sequelize'
 import { sequelize } from '../config/mssql'
 
-export interface UserProperties {
+export interface BookProperties {
     id: number
     name: string
     createdAt: Date
     updatedAt: Date
     isActive: boolean
+    isBorrowed: boolean
+    score: number
 }
 
-class User extends Model<UserProperties> implements UserProperties {
+class Book extends Model<BookProperties> implements BookProperties {
     public id!: number
     public name!: string
     public createdAt!: Date
     public updatedAt!: Date
     public isActive!: boolean
+    public isBorrowed!: boolean
+    public score!: number
 }
 
-User.init({
+Book.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -36,6 +40,7 @@ User.init({
     },
     updatedAt: {
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
         field: 'UpdatedAt'
     },
     isActive: {
@@ -43,10 +48,20 @@ User.init({
         defaultValue: 1,
         field: 'IsActive'
     },
+    isBorrowed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: 0,
+        field: 'IsBorrowed'
+    },
+    score: {
+        type: DataTypes.NUMBER,
+        defaultValue: -1,
+        field: 'Score'
+    },
 }, {
     sequelize,
-    tableName: 'Users',
+    tableName: 'Books',
     timestamps: false
 })
 
-export default User
+export default Book

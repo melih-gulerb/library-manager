@@ -1,44 +1,50 @@
-import { Request, Response } from 'express'
-import { UserService } from '../services/userService'
+import {NextFunction, Request, Response} from 'express'
+import {UserService} from '../services/userService'
 import {CreateUserRequest} from "../models/request/userRequest"
+import {BusinessError} from "../models/error";
 
 let userService = new UserService()
 
-export const findUserById = async (req: Request, res: Response) => {
+export const findUserById = async (req: Request, res: Response, next: NextFunction) => {
+    let id = 0
     try {
-        const user = await userService.findUserById(req.params.id)
-        if (user) {
-            return res.status(200).json(user)
-        } else {
-            res.status(404).json({ message: 'User not found' })
-        }
+        id = parseInt(req.params.id)
     } catch {
-        return res.status(500).json({ message: "" })
+        next(new BusinessError('Argument parse exception, possible incorrect arguments: id', 400))
+    }
+
+    try {
+        const user = await userService.findUserById(id)
+
+        return res.status(200).json(user)
+    } catch (err) {
+        next(err)
     }
 }
 
-export const findAllUsers = async (req: Request, res: Response) => {
+export const findAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await userService.findAll()
-        if (users) {
-            res.status(200).json(users)
-        } else {
-            res.status(404).json({ message: 'User not found' })
-        }
-    } catch {
-        res.status(500).json({ message: "" })
+
+        return res.status(200).json(users)
+    } catch (err) {
+        next(err)
     }
 }
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+    let request: CreateUserRequest = {name: ""}
     try {
-        const request: CreateUserRequest = req.body
-        let userId = await userService.createUser(request)
-
-        return res.json({"userId": userId })
-
+        request = req.body
     } catch {
-        res.status(500).json({ message: "" })
+        next(new BusinessError('Argument parse exception, possible incorrect arguments: name', 400))
     }
-    return res.json({"userId": 0 })
+
+    try {
+        await userService.createUser(request)
+
+        return res.status(201).json()
+    } catch (err) {
+        next(err)
+    }
 }

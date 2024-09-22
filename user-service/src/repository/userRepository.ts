@@ -1,54 +1,37 @@
 import User, {UserProperties} from "../models/user"
 import {FindUserProperties} from "../models/repository/userRepositoryModel"
-import {Sequelize} from "sequelize"
-import {CreateUserRequest} from "../models/request/userRequest";
-export class UserRepository {
-    async findById(id: string): Promise<UserProperties | null> {
-        try {
-            let user = await User.findOne({attributes: ['id', 'name'], where: {id: id}})
-            console.log(user)
+import {BusinessError} from "../models/error";
 
-            return user
+export class UserRepository {
+    async findById(id: number): Promise<UserProperties | null> {
+        try {
+            return await User.findOne({attributes: ['id', 'name'], where: {id: id}})
         }
         catch (err){
-            console.log(err)
+            throw new BusinessError(String(err), 500)
         }
-
-        return null
     }
 
     async findAll(): Promise<FindUserProperties[]> {
         try {
             return await User.findAll({
-                attributes: [[Sequelize.col('Id'), 'id'], [Sequelize.col('Name'), 'name']],
+                attributes: ['id', 'name'],
                 where: {
                     isActive: true
                 }
             }) as FindUserProperties[]
         } catch (err) {
-            console.log(err)
+            throw new BusinessError(String(err), 500)
         }
-
-        return []
     }
 
 
-    async create(userProperties: CreateUserRequest): Promise<number> {
+    async create(userProperties: UserProperties): Promise<void> {
         try {
-            const userCreationData: UserProperties = {
-                name: userProperties.name,
-                id: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                isActive: true,
-            }
-            let user = await User.create(userCreationData, { fields: ['name'] })
-            return user.id ?? 0
+            await User.create(userProperties, { fields: ['name'] })
         }
         catch (err) {
-            console.log(err)
+            throw new BusinessError(String(err), 500)
         }
-
-        return 0
     }
 }

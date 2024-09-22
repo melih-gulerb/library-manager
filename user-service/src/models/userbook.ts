@@ -10,7 +10,6 @@ export interface UserBookProperties {
     isActive: boolean
     state: number
     userScore: number
-    bookName: string
 }
 
 class UserBook extends Model<UserBookProperties> implements UserBookProperties {
@@ -22,12 +21,12 @@ class UserBook extends Model<UserBookProperties> implements UserBookProperties {
     public isActive!: boolean
     public state!: number
     public userScore!: number
-    public bookName!: string
 }
 
 UserBook.init({
     id: {
         type: DataTypes.NUMBER,
+        autoIncrement: true,
         primaryKey: true,
         field: 'Id'
     },
@@ -43,16 +42,17 @@ UserBook.init({
     },
     createdAt: {
         type: DataTypes.DATE,
-        allowNull: false,
         defaultValue: DataTypes.NOW,
         field: 'CreatedAt'
     },
     updatedAt: {
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
         field: 'UpdatedAt'
     },
     userScore: {
         type: DataTypes.NUMBER,
+        defaultValue: -1,
         field: 'UserScore'
     },
     state: {
@@ -62,14 +62,9 @@ UserBook.init({
     },
     isActive: {
         type: DataTypes.BOOLEAN,
-        defaultValue: 1,
+        defaultValue: true,
         field: 'IsActive'
-    },
-    bookName: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-        field: 'BookName'
-    },
+    }
 }, {
     sequelize,
     tableName: 'UserBook',

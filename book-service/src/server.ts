@@ -6,7 +6,6 @@ sequelize.authenticate().then(() => {
 }).catch((err) => {
     console.error('DB connection is refused', err)
 })
-
-app.listen(3000, () => {
-    console.log(`User-service server is running on port ${3000}`)
+app.listen(4000, () => {
+    console.log(`Book-service server is running on port ${4000}`)
 })
